@@ -9,45 +9,51 @@ This microservices branch was initially derived from [AngularJS version](https:/
 To achieve that goal we use Spring Cloud Gateway, Spring Cloud Circuit Breaker, Spring Cloud Config, Spring Cloud Sleuth, Resilience4j, Micrometer 
 and the Eureka Service Discovery from the [Spring Cloud Netflix](https://github.com/spring-cloud/spring-cloud-netflix) technology stack.
 
+## One-time Setup
+
+1. To get started, down the Splunk OpenTelemetry Java Agent with:
+
+    ```bash
+    $ ./download.sh
+    ```
+
+2. Create a file named `env-file.txt` at the top of the project directory with the following contents:
+
+    ```
+    SPLUNK_ACCESS_TOKEN=<your token>
+    SPLUNK_REALM=<your realm>
+    ```
+
+Replacing `<your token>` with an *Access Token* from your account.  Likewise, replace `<your realm>` with the realm your account was created in.
+
 ## Starting the application with instrumentation
 
-In order to start the application as configured for Splunk OpenTelemetry distribution, simply run `start.sh`. The script will:
-- download the agent
-- build Docker images
-- run all microservices using Docker compose
+1. Start by building the application using the supplied build script:
 
-If everything goes well, you can access the following services at given location:
-* Discovery Server - http://localhost:8761
-* Config Server - http://localhost:8888
-* AngularJS frontend (API Gateway) - http://localhost:8080
-* Customers, Vets and Visits Services - random port, check Eureka Dashboard 
-* Otel Collector - http://localhost:55680
-* Tracing Server (Zipkin) - http://localhost:9411/zipkin/ (we use [openzipkin](https://github.com/openzipkin/zipkin/tree/master/zipkin-server))
-* Admin Server (Spring Boot Admin) - http://localhost:9090
-* Grafana Dashboards - http://localhost:3000
-* Prometheus - http://localhost:9091
+    ```
+    ./build.sh
+    ```
 
-## Downloading OpenTelemetry Java Agent
+2. Once complete, start the application using the run script:
 
-Download the [latest release](https://github.com/signalfx/splunk-otel-java/releases/latest/download/splunk-otel-javaagent-all.jar)
-   of the Splunk Distribution of OpenTelemetry Java Instrumentation. For example use: 
-   ```bash
-   $ # download the newest version of the agent
-   $ sudo curl -vsSL -o /opt/splunk-otel-javaagent-all.jar 'https://github.com/signalfx/splunk-otel-java/releases/latest/download/splunk-otel-javaagent-all.jar'
-   ```
+    ```
+    ./run.sh
+    ```
 
-## Starting services locally with docker-compose
-In order to start entire infrastructure using Docker, you have to build images by executing `./mvnw clean install -P buildDocker` 
-from a project root. Once images are ready, you can start them with a single command
-`docker-compose up`. Containers startup order is coordinated with [`dockerize` script](https://github.com/jwilder/dockerize). 
-After starting services it takes a while for API Gateway to be in sync with service registry,
-so don't be scared of initial Spring Cloud Gateway timeouts. You can track services availability using Eureka dashboard
-available by default at http://localhost:8761.
+    After starting services it takes a while for API Gateway to be in sync with service registry, so don't be scared of initial Spring Cloud Gateway timeouts. You can track services availability using Eureka dashboard available by default at http://localhost:8761.
 
-The `master` branch uses an  Alpine linux  with JRE 8 as Docker base. You will find a Java 11 version in the `release/java11` branch.
+    If everything goes well, you can access the following services at given location:
+   
+    * Discovery Server - http://localhost:8761
+    * Config Server - http://localhost:8888
+    * AngularJS frontend (API Gateway) - http://localhost:8080
+    * Customers, Vets and Visits Services - random port, check Eureka Dashboard 
+    * Otel Collector - http://localhost:55680
+    * Tracing Server (Zipkin) - http://localhost:9411/zipkin/ (we use [openzipkin](https://github.com/openzipkin/zipkin/tree/master/zipkin-server))
+    * Admin Server (Spring Boot Admin) - http://localhost:9090
+    * Prometheus - http://localhost:9091
 
-*NOTE: Under MacOSX or Windows, make sure that the Docker VM has enough memory to run the microservices. The default settings
-are usually not enough and make the `docker-compose up` painfully slow.*
+*NOTE: Under MacOSX or Windows, make sure that the Docker VM has enough memory to run the microservices. The default settings are usually not enough and make the `docker-compose up` painfully slow.*
 
 ## Understanding the Spring Petclinic application
 
@@ -59,11 +65,9 @@ You can then access petclinic here: http://localhost:8080/
 
 ![Spring Petclinic Microservices screenshot](docs/application-screenshot.png)
 
-
 **Architecture diagram of the Spring Petclinic Microservices**
 
 ![Spring Petclinic Microservices architecture](docs/microservices-architecture-diagram.jpg)
-
 
 ## In case you find a bug/suggested improvement for Spring Petclinic Microservices
 
@@ -75,24 +79,13 @@ In its default configuration, Petclinic uses an in-memory database (HSQLDB) whic
 
 ## Custom metrics monitoring
 
-Grafana and Prometheus are included in the `docker-compose.yml` configuration, and the public facing applications
-have been instrumented with [MicroMeter](https://micrometer.io) to collect JVM and custom business metrics.
+Prometheus is included in the `docker-compose.yml` configuration, and the public facing applications have been instrumented with [MicroMeter](https://micrometer.io) to collect JVM and custom business metrics.
 
 A JMeter load testing script is available to stress the application and generate metrics: [petclinic_test_plan.jmx](spring-petclinic-api-gateway/src/test/jmeter/petclinic_test_plan.jmx)
-
-![Grafana metrics dashboard](docs/grafana-custom-metrics-dashboard.png)
 
 ### Using Prometheus
 
 * Prometheus can be accessed from your local machine at http://localhost:9091
-
-### Using Grafana with Prometheus
-
-* An anonymous access and a Prometheus datasource are setup.
-* A `Spring Petclinic Metrics` Dashboard is available at the URL http://localhost:3000/d/69JXeR0iw/spring-petclinic-metrics.
-You will find the JSON configuration file here: [docker/grafana/dashboards/grafana-petclinic-dashboard.json]().
-* You may create your own dashboard or import the [Micrometer/SpringBoot dashboard](https://grafana.com/dashboards/4701) via the Import Dashboard menu item.
-The id for this dashboard is `4701`.
 
 ### Custom metrics
 Spring Boot registers a lot number of core metrics: JVM, CPU, Tomcat, Logback... 
@@ -114,7 +107,7 @@ All those three REST controllers `OwnerResource`, `PetResource` and `VisitResour
 | API Gateway                     | [Spring Cloud Gateway starter](spring-petclinic-api-gateway/pom.xml) and [Routing configuration](/spring-petclinic-api-gateway/src/main/resources/application.yml) |
 | Docker Compose                  | [Spring Boot with Docker guide](https://spring.io/guides/gs/spring-boot-docker/) and [docker-compose file](docker-compose.yml) |
 | Circuit Breaker                 | [Resilience4j fallback method](spring-petclinic-api-gateway/src/main/java/org/springframework/samples/petclinic/api/boundary/web/ApiGatewayController.java)  |
-| Grafana / Prometheus Monitoring | [Micrometer implementation](https://micrometer.io/), [Spring Boot Actuator Production Ready Metrics] |
+| Prometheus Monitoring | [Micrometer implementation](https://micrometer.io/), [Spring Boot Actuator Production Ready Metrics] |
 
  Front-end module  | Files |
 |-------------------|-------|
@@ -122,7 +115,6 @@ All those three REST controllers `OwnerResource`, `PetResource` and `VisitResour
 | Bower             | [JavaScript libraries are defined by the manifest file bower.json](spring-petclinic-ui/bower.json)  |
 | Gulp              | [Tasks automated by Gulp: minify CSS and JS, generate CSS from LESS, copy other static resources](spring-petclinic-ui/gulpfile.js)  |
 | Angular JS        | [app.js, controllers and templates](spring-petclinic-ui/src/scripts/)  |
-
 
 ## Interesting Spring Petclinic forks
 
