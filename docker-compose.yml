@@ -11,7 +11,7 @@ services:
       JAVA_TOOL_OPTIONS: -javaagent:/otel/splunk-otel-javaagent-all.jar
       OTEL_TRACES_EXPORTER: otlp
       OTEL_METRICS_EXPORTER: none
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tracing-server:55680
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:55680
       OTEL_RESOURCE_ATTRIBUTES: service.name=config-server
     ports:
       - 8888:8888
@@ -26,7 +26,7 @@ services:
       JAVA_TOOL_OPTIONS: -javaagent:/otel/splunk-otel-javaagent-all.jar
       OTEL_TRACES_EXPORTER: otlp
       OTEL_METRICS_EXPORTER: none
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tracing-server:55680
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:55680
       OTEL_RESOURCE_ATTRIBUTES: service.name=discovery-server
     depends_on:
       - config-server
@@ -44,7 +44,7 @@ services:
       JAVA_TOOL_OPTIONS: -javaagent:/otel/splunk-otel-javaagent-all.jar
       OTEL_TRACES_EXPORTER: otlp
       OTEL_METRICS_EXPORTER: none
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tracing-server:55680
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:55680
       OTEL_RESOURCE_ATTRIBUTES: service.name=customers-service
     depends_on:
       - config-server
@@ -63,7 +63,7 @@ services:
       JAVA_TOOL_OPTIONS: -javaagent:/otel/splunk-otel-javaagent-all.jar
       OTEL_TRACES_EXPORTER: otlp
       OTEL_METRICS_EXPORTER: none
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tracing-server:55680
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:55680
       OTEL_RESOURCE_ATTRIBUTES: service.name=visits-service
     depends_on:
       - config-server
@@ -82,7 +82,7 @@ services:
       JAVA_TOOL_OPTIONS: -javaagent:/otel/splunk-otel-javaagent-all.jar
       OTEL_TRACES_EXPORTER: otlp
       OTEL_METRICS_EXPORTER: none
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tracing-server:55680
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:55680
       OTEL_RESOURCE_ATTRIBUTES: service.name=vets-service
     depends_on:
       - config-server
@@ -101,7 +101,7 @@ services:
       JAVA_TOOL_OPTIONS: -javaagent:/otel/splunk-otel-javaagent-all.jar
       OTEL_TRACES_EXPORTER: otlp
       OTEL_METRICS_EXPORTER: none
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tracing-server:55680
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:55680
       OTEL_RESOURCE_ATTRIBUTES: service.name=api-gateway
     depends_on:
       - config-server
@@ -110,22 +110,22 @@ services:
     ports:
       - 8080:8080
 
-  tracing-server:
-    image: quay.io/signalfx/splunk-otel-collector:latest
-    container_name: tracing-server
-    environment:
-      - SPLUNK_ACCESS_TOKEN=${SPLUNK_ACCESS_TOKEN}
-      - SPLUNK_REALM=${SPLUNK_REALM}
-    ports:
-      - "13133:13133"
-      - "14250:14250"
-      - "14268:14268"
-      - "4317:4317"
-      - "6060:6060"
-      - "7276:7276"
-      - "18888:8888"
-      - "9411:9411"
-      - "9943:9943"
+#   tracing-server:
+#     image: quay.io/signalfx/splunk-otel-collector:latest
+#     container_name: tracing-server
+#     environment:
+#       - SPLUNK_ACCESS_TOKEN=${SPLUNK_ACCESS_TOKEN}
+#       - SPLUNK_REALM=${SPLUNK_REALM}
+#     ports:
+#       - "13133:13133"
+#       - "14250:14250"
+#       - "14268:14268"
+#       - "4317:4317"
+#       - "6060:6060"
+#       - "7276:7276"
+#       - "18888:8888"
+#       - "9411:9411"
+#       - "9943:9943"
 
 #  tracing-server:
 #    image: otel/opentelemetry-collector
@@ -159,7 +159,7 @@ services:
       JAVA_TOOL_OPTIONS: -javaagent:/otel/splunk-otel-javaagent-all.jar
       OTEL_TRACES_EXPORTER: otlp
       OTEL_METRICS_EXPORTER: none
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tracing-server:55680
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:55680
       OTEL_RESOURCE_ATTRIBUTES: service.name=admin-server
     depends_on:
       - config-server
